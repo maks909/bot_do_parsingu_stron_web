@@ -8,7 +8,7 @@ class parse_bot():
         plik.close()
         self.bot = telebot.TeleBot(TOKEN)
 
-        self.menu = [["Select price", "Select condition", "Select location", "Start searching"],
+        self.main_menu = [["Select price", "Select condition", "Select location", "Start searching"],
             ["Select min price", "Select max price", "<-----"],
             ["m Any", "m 20 zł", "m 50 zł", "m 100 zł", "m 150 zł", "m 200 zł", "m 250 zł", "m 300 zł", "m 350 zł", "<-----"], ["20 zł m", "50 zł m", "100 zł m", "150 zł m", "200 zł m", "250 zł m", "300 zł m", "350 zł m", "400 zł m", "450 zł m", "500 zł m", "550 zł m", "600 zł m", "650 zł m", "Any m", "<-----"],
             ["New", "Used", "<-----"],
@@ -40,12 +40,11 @@ class parse_bot():
 
         @self.bot.message_handler(commands=["start"])
         def start(m):
-            for row in self.menu[0]:
-                self.markup.row(row)
+            self.change_markup(self.markup, self.main_menu[0], 3, m)
             print("started")
             mess = self.bot.send_message(m.chat.id, "Hello I can help you with finding good python book.", reply_markup=self.markup)
             print("Works??? ")
-            self.bot.register_next_step_handler(mess , self.menu)
+            self.bot.register_next_step_handler(mess, self.menu)
             print("works") 
             
         # @self.bot.message_handler(content_types=["text"])
@@ -78,12 +77,13 @@ class parse_bot():
         print("polling started") 
 
     def menu(self, m):
+        self.change_markup(self.markup, self.main_menu[0], 3, m)
         print("Works")
         if m.text == "Select price":
-            mess = self.change_markup(markup=self.markup, list=self.menu[1], row_width=2, m=m)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[1], row_width=2, m=m)
             self.bot.register_next_step_handler(mess, self.price_menu)
         elif m.text == "Select location":
-            mess = self.change_markup(markup=self.markup, list=self.menu[5], row_width=3, m=m)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[5], row_width=3, m=m)
             try:    
                 self.bot.register_next_step_handler(mess, self.location_menu)
             except Exception as ex:
@@ -91,7 +91,7 @@ class parse_bot():
             # elif m.text == "<-----":
             #     self.change_markup(markup=self.markup, list=self.menu[0], row_width=3, m=m)
         elif m.text == "Select condition":
-            mess = self.change_markup(markup=self.markup, list=self.menu[4], row_width=2, m=m)                
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[4], row_width=2, m=m)                
             self.bot.register_next_step_handler(mess, self.condition_menu)
             
         elif m.text == "Start searching" and self.min_price != None and self.max_price != None and self.city != None:
@@ -101,31 +101,33 @@ class parse_bot():
 
     def price_menu(self, m):
         if m.text == "Select min price":
-            mess = self.change_markup(markup=self.markup, list=self.menu[2], row_width=3, m=m)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[2], row_width=3, m=m)
             self.bot.register_next_step_handler(mess, self.min_price_self.menu)
             return
         elif m.text == "Select max price":
-            mess = self.change_markup(markup=self.markup, list=self.menu[3], row_width=3, m=m)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[3], row_width=3, m=m)
             self.bot.register_next_step_handler(mess, self.max_price_menu)
             return
+        elif m.text == "<-----":
+            self.bot.register_next_step_handler(m, self.menu(m))
 
     def min_price_menu(self, m):
-        self.min_price = self.set_min_price(m, self.menu)
+        self.min_price = self.set_min_price(m, self.main_menu)
         if m.text == "<-----":
             self.bot.register_next_step_handler(m, self.price_menu)
 
     def max_price_menu(self, m):
-        mess = self.max_price = self.set_max_price(m, self.menu)
+        mess = self.max_price = self.set_max_price(m, self.main_menu)
         if m.text == "<-----":
             self.bot.register_next_step_handler(m, self.price_menu)
     
     def condition_menu(self, m):
-        self.condition = set_condition(m, self.menu)
+        self.condition = self.set_condition(m, self.main_menu)
         if m.text == "<-----":
             self.bot.register_next_step_handler(m, self.menu)
 
     def location_menu(self, m):
-        self.city = set_city(m, self.menu)
+        self.city = self.set_city(m, self.main_menu)
         if m.text == "<-----":
             self.bot.register_next_step_handler(m, self.menu)
 
