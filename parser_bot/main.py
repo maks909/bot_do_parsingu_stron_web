@@ -9,8 +9,8 @@ class parse_bot():
         self.bot = telebot.TeleBot(TOKEN)
 
         self.main_menu = [["Select price", "Select condition", "Select location", "Start searching"],
-            ["Select min price", "Select max price", "<-----"],
-            ["m Any", "m 20 zł", "m 50 zł", "m 100 zł", "m 150 zł", "m 200 zł", "m 250 zł", "m 300 zł", "m 350 zł", "<-----"], ["20 zł m", "50 zł m", "100 zł m", "150 zł m", "200 zł m", "250 zł m", "300 zł m", "350 zł m", "400 zł m", "450 zł m", "500 zł m", "550 zł m", "600 zł m", "650 zł m", "Any m", "<-----"],
+            ["Selectin price", "Select max price", "<-----"],
+            ["Any", "20 zł", "50 zł", "100 zł", "150 zł", "200 zł", "250 zł", "300 zł", "350 zł", "<-----"], ["20 zł", "50 zł", "100 zł", "150 zł", "200 zł", "250 zł", "300 zł", "350 zł", "400 zł", "450 zł", "500 zł", "550 zł", "600 zł", "650 zł", "Any", "<-----"],
             ["New", "Used", "<-----"],
             ["Warsawa",
             "Wrocław", 
@@ -167,14 +167,14 @@ class parse_bot():
             print("Something went wrong \n", ex)
 
     def set_min_price(self, m, list):
-        if m.text in list[2] and "m " in m.text:
-            if m.text == "m Any":
+        if m.text in list[2]:
+            if m.text == "Any":
                 return "0 zł"
             return m.text[1:]
 
     def set_max_price(self, m, list):
-        if m.text in list[3] and " m" in m.text:
-            if m.text == "Any m":
+        if m.text in list[3]:
+            if m.text == "Any":
                 return "0 zł"
             return m.text[:-2]
 
