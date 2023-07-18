@@ -73,10 +73,11 @@ class parse_bot():
         self.bot.load_next_step_handlers()
         print("step handlers loaded")
         print("polling suposed to start")
-        self.bot.infinity_polling()
+        self.bot.polling(none_stop = True)
         print("polling started") 
 
     def menu(self, m):
+        print("main menu started")
         self.change_markup(self.markup, self.main_menu[0], 3, m)
         print("Works")
         if m.text == "Select price":
@@ -100,36 +101,59 @@ class parse_bot():
             #     self.city = self.set_city(m, self.menu)
 
     def price_menu(self, m):
+        print("price menu started")
         if m.text == "Select min price":
             mess = self.change_markup(markup=self.markup, list=self.main_menu[2], row_width=3, m=m)
-            self.bot.register_next_step_handler(mess, self.min_price_self.menu)
+            self.bot.register_next_step_handler(mess, self.min_price)#, self.menu)
             return
         elif m.text == "Select max price":
             mess = self.change_markup(markup=self.markup, list=self.main_menu[3], row_width=3, m=m)
             self.bot.register_next_step_handler(mess, self.max_price_menu)
             return
         elif m.text == "<-----":
-            self.bot.register_next_step_handler(m, self.menu(m))
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
+
+    # def min_price_menu(self, m):
+    #     if m.text == "<-----":
+    #         mess = self.change_markup(markup=self.markup, list=self.main_menu[1], row_width=3, m=m)
+    #         self.bot.register_next_step_handler(mess, self.price_menu)
+    #     else:
+    #         self.min_price = self.set_min_price(m, self.main_menu)
+    #         # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+    #         # self.bot.register_next_step_handler(mess, self.menu)
 
     def min_price_menu(self, m):
-        self.min_price = self.set_min_price(m, self.main_menu)
         if m.text == "<-----":
-            self.bot.register_next_step_handler(m, self.price_menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[1], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.price_menu)
+        else:
+            self.min_price = self.set_min_price(m, self.main_menu)
+            # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            # self.bot.register_next_step_handler(mess, self.menu)
 
     def max_price_menu(self, m):
-        mess = self.max_price = self.set_max_price(m, self.main_menu)
         if m.text == "<-----":
-            self.bot.register_next_step_handler(m, self.price_menu)
-    
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[1], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.price_menu)
+        else:
+            self.max_price = self.set_max_price(m, self.main_menu)
+            # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            # self.bot.register_next_step_handler(mess, self.menu)
+
     def condition_menu(self, m):
-        self.condition = self.set_condition(m, self.main_menu)
         if m.text == "<-----":
-            self.bot.register_next_step_handler(m, self.menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
+        else:
+            self.condition = self.set_condition(m, self.main_menu)
 
     def location_menu(self, m):
-        self.city = self.set_city(m, self.main_menu)
         if m.text == "<-----":
-            self.bot.register_next_step_handler(m, self.menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
+        else:    
+            self.city = self.set_city(m, self.main_menu)     
 
     def change_markup(self, markup, list, row_width, m):
         try:    
