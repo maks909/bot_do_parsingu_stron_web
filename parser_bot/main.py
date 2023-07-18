@@ -104,7 +104,7 @@ class parse_bot():
         print("price menu started")
         if m.text == "Select min price":
             mess = self.change_markup(markup=self.markup, list=self.main_menu[2], row_width=3, m=m)
-            self.bot.register_next_step_handler(mess, self.min_price)#, self.menu)
+            self.bot.register_next_step_handler(mess, self.min_price_menu)#, self.menu)
             return
         elif m.text == "Select max price":
             mess = self.change_markup(markup=self.markup, list=self.main_menu[3], row_width=3, m=m)
