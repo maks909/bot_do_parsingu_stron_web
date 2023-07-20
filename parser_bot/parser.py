@@ -38,7 +38,7 @@ class parser():
         self.books = []
     # book_list = soup.findAll("a", class_='css-rc5s2u')
     #print(len(book_list))
-    def find_all_on_pages(pages):    
+    def find_all_on_pages(self, pages):    
         for i in range(0, pages):
             r = requests.get(self.url+str(i))
             soup = BeautifulSoup(r.text, "lxml")
@@ -59,7 +59,7 @@ class parser():
                     self.books.append(book)
                 except Exception as ex:
                     print("Something went wrong... ", ex)
-    def show_all(books):    
+    def show_all(self, books):    
         for one_book in self.books:
             try:
                 print(f'''
@@ -78,11 +78,11 @@ class parser():
                         '''+ "-"*80)
             except Exception as ex:
                 print("Something went wrong... ", ex)
-    def make_a_table(list, columns, name):
+    def make_a_table(self, list, columns, name):
         header = columns #["title", "url", "price", "condition", "location", "refresh_time"]
         datafile = pandas.DataFrame(list, columns=header) #self.books,
         file_path = os.path.join(os.path.dirname(__file__), "data")
-        datafile.to_csv(os.path.join(file_path, f"name.csv"), sep=";", encoding="utf8")       
+        datafile.to_csv(os.path.join(file_path, f"{name}.csv"), sep=";", encoding="utf8")       
 # max_price = 60
 # url_with_add_par = f"https://www.olx.pl/muzyka-edukacja/ksiazki/ksiazki-naukowe/q-python/?search%5Bfilter_float_publishyear:from%5D=2020&view=list&search%5Bfilter_float_price:to%5D={max_price}"
 # books_with_changed_par = []
