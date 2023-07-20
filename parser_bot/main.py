@@ -1,15 +1,16 @@
 import telebot
 import os
-#import parser.py
+import parser
 class parse_bot():
-    def __init__(self):
+    def __init__(self, parser):
         plik = open(os.path.join(os.path.dirname(__file__), "TOKEN.ini"))
         TOKEN = plik.read()
         plik.close()
         self.bot = telebot.TeleBot(TOKEN)
+        self.parser = parser
 
         self.main_menu = [["Select price", "Select condition", "Select location", "Start searching"],
-            ["Selectin price", "Select max price", "<-----"],
+            ["Select min price", "Select max price", "<-----"],
             ["Any", "20 zł", "50 zł", "100 zł", "150 zł", "200 zł", "250 zł", "300 zł", "350 zł", "<-----"], ["20 zł", "50 zł", "100 zł", "150 zł", "200 zł", "250 zł", "300 zł", "350 zł", "400 zł", "450 zł", "500 zł", "550 zł", "600 zł", "650 zł", "Any", "<-----"],
             ["New", "Used", "<-----"],
             ["Warsawa",
@@ -31,10 +32,10 @@ class parse_bot():
             "Sosnowiec",
             "<-----"]]
         
-        self.min_price = None
-        self.max_price = None
-        self.condition = None
-        self.city = None
+        self.min_price = "0 zł"
+        self.max_price = "0 zł"
+        self.condition = "Wszystkie"
+        self.city = "Cała Polska"
 
         self.markup = telebot.types.ReplyKeyboardMarkup(row_width=3, one_time_keyboard=True)
 
@@ -95,10 +96,14 @@ class parse_bot():
             mess = self.change_markup(markup=self.markup, list=self.main_menu[4], row_width=2, m=m)                
             self.bot.register_next_step_handler(mess, self.condition_menu)
             
-        elif m.text == "Start searching" and self.min_price != None and self.max_price != None and self.city != None:
-            pass
-            # else:
-            #     self.city = self.set_city(m, self.menu)
+        elif m.text == "Start searching":
+            data_list = [{"min price":self.min_price, "max price":self.max_price, "condition":self.condition, "location":self.city}]
+            self.parser.find_all_on_pages(5)
+            self.parser.make_a_table(self.parser.books, ["title", "url", "price", "condition", "location", "refresh time"], "parsed_data")
+            self.bot.send_message(m.chat.id, f'Szukam książki od {self.min_price} do {self.max_price}, o stanie "{self.condition}" w "{self.city}".')
+            print(data_list)
+            columns = ["min price", "max price", "condition", "location"]
+            self.parser.make_a_table(list=data_list, columns=columns, name=str(m.chat.id))
 
     def price_menu(self, m):
         print("price menu started")
@@ -121,7 +126,7 @@ class parse_bot():
     #     else:
     #         self.min_price = self.set_min_price(m, self.main_menu)
     #         # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
-    #         # self.bot.register_next_step_handler(mess, self.menu)
+    #         # self.bot.register_next_step_handler(mess, self.menu)     
 
     def min_price_menu(self, m):
         if m.text == "<-----":
@@ -129,8 +134,8 @@ class parse_bot():
             self.bot.register_next_step_handler(mess, self.price_menu)
         else:
             self.min_price = self.set_min_price(m, self.main_menu)
-            # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
-            # self.bot.register_next_step_handler(mess, self.menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
 
     def max_price_menu(self, m):
         if m.text == "<-----":
@@ -138,8 +143,8 @@ class parse_bot():
             self.bot.register_next_step_handler(mess, self.price_menu)
         else:
             self.max_price = self.set_max_price(m, self.main_menu)
-            # mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
-            # self.bot.register_next_step_handler(mess, self.menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
 
     def condition_menu(self, m):
         if m.text == "<-----":
@@ -147,6 +152,8 @@ class parse_bot():
             self.bot.register_next_step_handler(mess, self.menu)
         else:
             self.condition = self.set_condition(m, self.main_menu)
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
 
     def location_menu(self, m):
         if m.text == "<-----":
@@ -154,6 +161,8 @@ class parse_bot():
             self.bot.register_next_step_handler(mess, self.menu)
         else:    
             self.city = self.set_city(m, self.main_menu)     
+            mess = self.change_markup(markup=self.markup, list=self.main_menu[0], row_width=3, m=m)
+            self.bot.register_next_step_handler(mess, self.menu)
 
     def change_markup(self, markup, list, row_width, m):
         try:    
@@ -188,4 +197,5 @@ class parse_bot():
         if m.text in list[5]:
             return m.text 
 
-bot = parse_bot()
+parse_program = parser.parser()
+bot = parse_bot(parse_program)
