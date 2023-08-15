@@ -52,6 +52,10 @@ class parser():
                     book["price"] =  one_book.find("div", class_="css-u2ayx9").find("p", class_="css-10b0gli er34gjf0").text
                     if "do negocjacji" in book["price"]:
                         book["price"] = book["price"][:-len("do negocjacji")]
+                    elif book["price"] == "Za darmo" or book["price"] == "Zamienię":
+                        book["price"]="0 zł"
+                    if "," in book["price"]:
+                        book["price"][book["price"].index(",")] = "."
                     book["condition"] = one_book.find("span", class_="css-3lkihg").get("title") #.find("div", class_="css-u2ayx9").find("div", class_="css-112xsl6")
                     book["location_and_refresh_time"] = one_book.find("p", class_="css-veheph er34gjf0").text
                     book["location"] = book["location_and_refresh_time"][0:book["location_and_refresh_time"].find("-")]
@@ -82,7 +86,58 @@ class parser():
         header = columns #["title", "url", "price", "condition", "location", "refresh_time"]
         datafile = pandas.DataFrame(list, columns=header) #self.books,
         file_path = os.path.join(os.path.dirname(__file__), "data")
-        datafile.to_csv(os.path.join(file_path, f"{name}.csv"), sep=";", encoding="utf8")       
+        datafile.to_csv(os.path.join(file_path, f"{name}.csv"), sep=";", encoding="utf8")
+    
+
+    def search_table_in_table(self, table_1, table_2, search_list):
+        plik_do_oglądania = pandas.read_csv(table_1, sep=";", encoding = "utf8", parse_dates=["title", "url", "price", "condition", "location"])
+        plik_do_szukania = pandas.read_csv(table_2, sep=";", encoding = "utf8", parse_dates=["min price", "max price", "condition", "location"])
+        
+        print(plik_do_oglądania.iloc[0])
+        print("-"*20)
+        
+        # plik_do_szukania(search_list)
+        # print(plik_do_szukania)
+        # print(plik_do_oglądania)
+        # print("\n\n\n")
+        # print(plik_do_szukania.info())
+        # print(plik_do_oglądania.info())
+        print(plik_do_szukania["min price"][0])
+        print("-"*20)
+        # print(plik_do_oglądania["price"][:-2])
+        # print(len(plik_do_oglądania["price"][:-2]))
+        good_books_list = []
+        for x in range(0, len(plik_do_oglądania["price"][:-2])):
+        # print(plik_do_szukania["location"][0])
+            if (float(plik_do_oglądania["price"][x][:-2]) > float(plik_do_szukania["min price"][0]) and float(plik_do_oglądania.price[x][:-2]) < float(plik_do_szukania["max price"][0])
+            and (plik_do_szukania["condition"][0] in plik_do_oglądania["condition"][x] or plik_do_szukania["condition"][0]=="Wszystkie") and (plik_do_szukania["location"][0] in plik_do_oglądania["location"][x] or "Cała Polska" == plik_do_szukania["location"][0])):
+                good_books_list.append(x)
+            #else:
+                #print(plik_do_oglądania["price"][x][:-2], end="\n"+"_"*10)
+        
+        print(good_books_list)
+        good_books = plik_do_oglądania.iloc[good_books_list]
+        print(good_books)
+        file_path = os.path.join(os.path.dirname(__file__), "data")
+        good_books.to_html(os.path.join(file_path, "html_file.html"), render_links=True, encoding="utf-8", index = False)
+
+
+        return os.path.join(file_path, "html_file.html"), good_books
+        #print(plik_do_oglądania[int(plik_do_oglądania["price"][:-2]) > plik_do_szukania["min price"][0] and int(plik_do_oglądania.price[:-2]) < plik_do_szukania["max price"][0]])
+        # lista = str(plik_do_szukania).split("\n")[1].split("  ")
+        # print(lista)
+        #lista = plik_do_oglądania.split("\n")
+
+    def give_values(self, df, columns, row = 0):
+        list=[] 
+        for y in columns:   
+            list.append(x.iloc[row][y])
+        return list
+
+
+
+
+
 # max_price = 60
 # url_with_add_par = f"https://www.olx.pl/muzyka-edukacja/ksiazki/ksiazki-naukowe/q-python/?search%5Bfilter_float_publishyear:from%5D=2020&view=list&search%5Bfilter_float_price:to%5D={max_price}"
 # books_with_changed_par = []
