@@ -56,6 +56,8 @@ class parser():
                         book["price"]="0 zł"
                     if "," in book["price"]:
                         book["price"][book["price"].index(",")] = "."
+                    while " " in book["price"]:
+                        book["price"] = book["price"][:book["price"].index(" ")] + book["price"][book["price"].index(" ")+1:]
                     book["condition"] = one_book.find("span", class_="css-3lkihg").get("title") #.find("div", class_="css-u2ayx9").find("div", class_="css-112xsl6")
                     book["location_and_refresh_time"] = one_book.find("p", class_="css-veheph er34gjf0").text
                     book["location"] = book["location_and_refresh_time"][0:book["location_and_refresh_time"].find("-")]
@@ -133,6 +135,20 @@ class parser():
         for y in columns:   
             list.append(x.iloc[row][y])
         return list
+
+    def return_strings(self, pattern, table, key_list):
+        list = []
+        list_of_information = []
+        for row in range(0, len(table)):
+            for key in key_list:
+                dict_of_information = table.iloc[row].to_dict()
+                list_of_information.append(dict_of_information[key])
+            print(tuple(list_of_information))
+            list.append(pattern % tuple(list_of_information))
+            list_of_information = []
+        return list
+
+            
 
 
 
