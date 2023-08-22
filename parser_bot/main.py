@@ -108,7 +108,13 @@ class parse_bot():
             file_path = os.path.join(os.path.dirname(__file__), "data")
             good_books = self.parser.search_table_in_table(os.path.join(file_path, "parsed_data.csv"), os.path.join(file_path, f"{str(m.chat.id)}.csv"), columns)
             opened_books = open(good_books[0])
-            self.bot.send_message(m.chat.id, "I could find some books for you. You will have them in the table and independently.")
+            string = '''Name: - %s,
+                        Condition: - %s,
+                        Price: - %s,
+                        Location: - %s,
+                        Url: - %s'''
+            list_of_messages = self.parser.return_strings(string, good_books[1], ["title", "condition", "price", "location", "url"])
+            self.bot.send_message(m.chat.id, f"I could {len(list_of_messages)} books for you. You will have them in the table and independently.")
             self.bot.send_document(m.chat.id, opened_books)
             opened_books.close()
             string = '''Name: - %s,
@@ -116,7 +122,6 @@ class parse_bot():
                         Price: - %s,
                         Location: - %s,
                         Url: - %s'''
-            list_of_messages = self.parser.return_strings(string, good_books[1], ["title", "condition", "price", "location", "url"])
             for x in range(0, len(list_of_messages)):
                 self.bot.send_message(m.chat.id, list_of_messages[x])
                 if x >= 4:
@@ -201,7 +206,7 @@ class parse_bot():
             self.markup = telebot.types.ReplyKeyboardMarkup(row_width=row_width, one_time_keyboard=True)
             for row in list:
                 self.markup.row(row)
-            mess = self.bot.send_message(m.chat.id, '''   ''', reply_markup=self.markup)
+            mess = self.bot.send_message(m.chat.id, '''_''', reply_markup=self.markup)
             return mess
         except Exception as ex:
             print("Something went wrong \n", ex)
