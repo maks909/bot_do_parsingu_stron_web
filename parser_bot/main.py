@@ -201,7 +201,7 @@ class parse_bot():
             self.markup = telebot.types.ReplyKeyboardMarkup(row_width=row_width, one_time_keyboard=True)
             for row in list:
                 self.markup.row(row)
-            mess = self.bot.send_message(m.chat.id, "Pressed succesfully", reply_markup=self.markup)
+            mess = self.bot.send_message(m.chat.id, '''   ''', reply_markup=self.markup)
             return mess
         except Exception as ex:
             print("Something went wrong \n", ex)
