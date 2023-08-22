@@ -1,2 +1,5 @@
 parser_bot/data/olx_2020+.csv
 parser_bot/data/olx.csv
+.handler-saves/step.save
+parser_bot/data/*
+.handler-saves/step.save.tmp
